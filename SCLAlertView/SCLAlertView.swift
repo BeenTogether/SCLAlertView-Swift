@@ -80,6 +80,7 @@ open class SCLButton: UIButton {
     var customTextColor:UIColor?
     var initialTitle:String!
     var showTimeout:ShowTimeoutConfiguration?
+    var underline: Bool = false
     
     public struct ShowTimeoutConfiguration {
         let prefix: String
@@ -101,6 +102,20 @@ open class SCLButton: UIButton {
     
     override public init(frame:CGRect) {
         super.init(frame:frame)
+    }
+    
+    override func viewWillLayoutSubviews {
+        updateButton()
+    }
+    
+    func updateButton() {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: titleLabel?.font as Any,
+            .foregroundColor: titleColor(for: .normal) as Any,
+            .underlineStyle: (self.underline ? NSUnderlineStyle.single.rawValue : NSUnderlineStyle.none.rawValue)]
+        let attributeString = NSMutableAttributedString(string: (titleLabel?.text!)!,
+                                                        attributes: attributes)
+        setAttributedTitle(attributeString, for: .normal)
     }
 }
 
@@ -568,7 +583,7 @@ open class SCLAlertView: UIViewController {
     }
     
     @discardableResult
-    open func addButton(_ title:String, backgroundColor:UIColor? = nil, textColor:UIColor? = nil, showTimeout:SCLButton.ShowTimeoutConfiguration? = nil, action:@escaping ()->Void)->SCLButton {
+    open func addButton(_ title:String, backgroundColor:UIColor? = nil, textColor:UIColor? = nil, underline: Bool? = false, showTimeout:SCLButton.ShowTimeoutConfiguration? = nil, action:@escaping ()->Void)->SCLButton {
         let btn = addButton(title, backgroundColor: backgroundColor, textColor: textColor, showTimeout: showTimeout)
         btn.actionType = SCLActionType.closure
         btn.action = action
@@ -579,7 +594,7 @@ open class SCLAlertView: UIViewController {
     }
     
     @discardableResult
-    open func addButton(_ title:String, backgroundColor:UIColor? = nil, textColor:UIColor? = nil, showTimeout:SCLButton.ShowTimeoutConfiguration? = nil, target:AnyObject, selector:Selector)->SCLButton {
+    open func addButton(_ title:String, backgroundColor:UIColor? = nil, textColor:UIColor? = nil, underline: Bool? = false, showTimeout:SCLButton.ShowTimeoutConfiguration? = nil, target:AnyObject, selector:Selector)->SCLButton {
         let btn = addButton(title, backgroundColor: backgroundColor, textColor: textColor, showTimeout: showTimeout)
         btn.actionType = SCLActionType.selector
         btn.target = target
@@ -591,7 +606,7 @@ open class SCLAlertView: UIViewController {
     }
     
     @discardableResult
-    fileprivate func addButton(_ title:String, backgroundColor:UIColor? = nil, textColor:UIColor? = nil, showTimeout:SCLButton.ShowTimeoutConfiguration? = nil)->SCLButton {
+    fileprivate func addButton(_ title:String, backgroundColor:UIColor? = nil, textColor:UIColor? = nil, underline: Bool? = false, showTimeout:SCLButton.ShowTimeoutConfiguration? = nil)->SCLButton {
         // Update view height
         appearance.setkWindowHeight(appearance.kWindowHeight + appearance.kButtonHeight)
         
@@ -604,6 +619,7 @@ open class SCLAlertView: UIViewController {
         btn.customTextColor = textColor
         btn.initialTitle = title
         btn.showTimeout = showTimeout
+        btn.underline = underline
         contentView.addSubview(btn)
         buttons.append(btn)
         return btn
