@@ -103,20 +103,6 @@ open class SCLButton: UIButton {
     override public init(frame:CGRect) {
         super.init(frame:frame)
     }
-    
-    override func layoutSubviews() {
-        updateButton()
-    }
-    
-    func updateButton() {
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: titleLabel?.font as Any,
-            .foregroundColor: titleColor(for: .normal) as Any,
-            .underlineStyle: (self.underline ? NSUnderlineStyle.single.rawValue : NSUnderlineStyle.none.rawValue)]
-        let attributeString = NSMutableAttributedString(string: (titleLabel?.text!)!,
-                                                        attributes: attributes)
-        setAttributedTitle(attributeString, for: .normal)
-    }
 }
 
 // Allow alerts to be closed/renamed in a chainable manner
@@ -162,14 +148,14 @@ open class SCLAlertView: UIViewController {
         let kCircleHeight: CGFloat
         let kCircleIconHeight: CGFloat
         let kTitleHeight:CGFloat
-	let kTitleMinimumScaleFactor: CGFloat
+    let kTitleMinimumScaleFactor: CGFloat
         let kWindowWidth: CGFloat
         var kWindowHeight: CGFloat
         var kTextHeight: CGFloat
         let kTextFieldHeight: CGFloat
         let kTextViewdHeight: CGFloat
         let kButtonHeight: CGFloat
-		let circleBackgroundColor: UIColor
+        let circleBackgroundColor: UIColor
         let contentViewColor: UIColor
         let contentViewBorderColor: UIColor
         let titleColor: UIColor
@@ -247,7 +233,7 @@ open class SCLAlertView: UIViewController {
             self.kTextFieldHeight = kTextFieldHeight
             self.kTextViewdHeight = kTextViewdHeight
             self.kButtonHeight = kButtonHeight
-			self.circleBackgroundColor = circleBackgroundColor
+            self.circleBackgroundColor = circleBackgroundColor
             self.contentViewColor = contentViewColor
             self.contentViewBorderColor = contentViewBorderColor
             self.titleColor = titleColor
@@ -571,7 +557,7 @@ open class SCLAlertView: UIViewController {
         appearance.setkWindowHeight(appearance.kWindowHeight + appearance.kTextViewdHeight)
         // Add text view
         let txt = UITextView()
-        // No placeholder with UITextView but you can use KMPlaceholderTextView library 
+        // No placeholder with UITextView but you can use KMPlaceholderTextView library
         txt.font = appearance.kTextFont
         //txt.autocapitalizationType = UITextAutocapitalizationType.Words
         //txt.clearButtonMode = UITextFieldViewMode.WhileEditing
@@ -584,7 +570,7 @@ open class SCLAlertView: UIViewController {
     
     @discardableResult
     open func addButton(_ title:String, backgroundColor:UIColor? = nil, textColor:UIColor? = nil, underline: Bool? = false, showTimeout:SCLButton.ShowTimeoutConfiguration? = nil, action:@escaping ()->Void)->SCLButton {
-        let btn = addButton(title, backgroundColor: backgroundColor, textColor: textColor, showTimeout: showTimeout)
+        let btn = addButton(title, backgroundColor: backgroundColor, textColor: textColor, underline: underline, showTimeout: showTimeout)
         btn.actionType = SCLActionType.closure
         btn.action = action
         btn.addTarget(self, action:#selector(SCLAlertView.buttonTapped(_:)), for:.touchUpInside)
@@ -595,7 +581,7 @@ open class SCLAlertView: UIViewController {
     
     @discardableResult
     open func addButton(_ title:String, backgroundColor:UIColor? = nil, textColor:UIColor? = nil, underline: Bool? = false, showTimeout:SCLButton.ShowTimeoutConfiguration? = nil, target:AnyObject, selector:Selector)->SCLButton {
-        let btn = addButton(title, backgroundColor: backgroundColor, textColor: textColor, showTimeout: showTimeout)
+        let btn = addButton(title, backgroundColor: backgroundColor, textColor: textColor, underline: underline, showTimeout: showTimeout)
         btn.actionType = SCLActionType.selector
         btn.target = target
         btn.selector = selector
@@ -619,7 +605,7 @@ open class SCLAlertView: UIViewController {
         btn.customTextColor = textColor
         btn.initialTitle = title
         btn.showTimeout = showTimeout
-        btn.underline = underline
+        btn.underline = underline ?? false
         contentView.addSubview(btn)
         buttons.append(btn)
         return btn
@@ -901,6 +887,16 @@ open class SCLAlertView: UIViewController {
                 // Use default BackgroundColor derived from AlertStyle
                 btn.setTitleColor(UIColorFromRGB(colorTextButton ?? 0xFFFFFF), for:UIControlState())
             }
+
+            if btn.underline {
+                let attributes: [NSAttributedString.Key: Any] = [
+                    .font: btn.titleLabel?.font as Any,
+                    .foregroundColor: btn.titleColor(for: .normal) as Any,
+                    .underlineStyle: NSUnderlineStyle.styleSingle.rawValue]
+                let attributeString = NSMutableAttributedString(string: (btn.titleLabel?.text!)!,
+                                                                attributes: attributes)
+                btn.setAttributedTitle(attributeString, for: .normal)
+            }
         }
         
         // Adding timeout
@@ -952,7 +948,7 @@ open class SCLAlertView: UIViewController {
         self.baseView.frame.origin = animationStartOrigin
         
         if self.appearance.dynamicAnimatorActive {
-            UIView.animate(withDuration: animationDuration, animations: { 
+            UIView.animate(withDuration: animationDuration, animations: {
                 self.view.alpha = 1.0
             })
             self.animate(item: self.baseView, center: rv.center)
