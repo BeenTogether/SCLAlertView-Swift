@@ -104,7 +104,7 @@ open class SCLButton: UIButton {
         super.init(frame:frame)
     }
     
-    override func viewWillLayoutSubviews() {
+    override func layoutSubviews() {
         updateButton()
     }
     
